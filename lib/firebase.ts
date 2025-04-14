@@ -1,25 +1,54 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
+import { config } from "./config";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBYcTwJLUA9YXfZsigyLGJy6WMsYKfdJXo",
-  authDomain: "ncpi-102ca.firebaseapp.com",
-  databaseURL: "https://ncpi-102ca-default-rtdb.firebaseio.com",
-  projectId: "ncpi-102ca",
-  storageBucket: "ncpi-102ca.firebasestorage.app",
-  messagingSenderId: "592471971260",
-  appId: "1:592471971260:web:acea66a4add39211d387b9",
-  measurementId: "G-KR1NKD77R7"
-};
+// Determine environment
+const env = process.env.NODE_ENV || 'development';
+const firebaseConfig = config.firebase[env];
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
-const db = getFirestore(app);
-const database = getDatabase(app);
-const auth = getAuth(app);
+// Initialize Firebase only if it hasn't been initialized
+let app;
+let analytics;
+let db;
+let database;
+let auth;
 
-export { app, analytics, db, database, auth }; 
+try {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+    
+    // Initialize services only in browser environment
+    if (typeof window !== 'undefined') {
+      analytics = getAnalytics(app);
+      auth = getAuth(app);
+    }
+    
+    db = getFirestore(app);
+    database = getDatabase(app);
+  }
+} catch (error) {
+  console.error('Error initializing Firebase:', error);
+  
+  // Provide fallback or handle error appropriately
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('Firebase initialization failed. Make sure all config values are set correctly.');
+  }
+}
+
+export { app, analytics, db, database, auth };
+
+// Utility function to check Firebase connection
+export const checkFirebaseConnection = async () => {
+  try {
+    const db = getFirestore();
+    await db.terminate(); // This will attempt to close any connections
+    await db.enableNetwork(); // This will attempt to reconnect
+    return true;
+  } catch (error) {
+    console.error('Firebase connection check failed:', error);
+    return false;
+  }
+}; 
