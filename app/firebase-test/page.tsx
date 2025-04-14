@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { db, auth } from '@/lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
+import { getDatabase, ref, set } from 'firebase/database';
 import { signInAnonymously } from 'firebase/auth';
 
 export default function FirebaseTestPage() {
@@ -14,18 +14,21 @@ export default function FirebaseTestPage() {
       
       // Primeiro, fazer login anônimo
       setMessage('Autenticando...');
-      await signInAnonymously(auth);
+      const userCredential = await signInAnonymously(auth);
       
       // Depois tentar escrever no banco
       setMessage('Testando escrita...');
-      const docRef = await addDoc(collection(db, 'test'), {
+      const db = getDatabase();
+      const testRef = ref(db, 'test/' + userCredential.user.uid);
+      
+      await set(testRef, {
         test: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
 
-      setMessage(`Sucesso! Documento criado com ID: ${docRef.id}`);
-      console.log('Documento criado:', docRef.id);
+      setMessage(`Sucesso! Documento criado para usuário: ${userCredential.user.uid}`);
+      console.log('Documento criado para usuário:', userCredential.user.uid);
     } catch (error) {
       console.error('Erro completo:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -42,7 +45,7 @@ export default function FirebaseTestPage() {
           <p>Esta página testa a conexão com o Firebase tentando:</p>
           <ol className="list-decimal list-inside mt-2 space-y-1 text-left">
             <li>Fazer login anônimo</li>
-            <li>Criar um documento de teste</li>
+            <li>Criar um documento de teste no Realtime Database</li>
           </ol>
         </div>
 
