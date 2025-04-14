@@ -5,7 +5,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { type Initiative } from "@/lib/firebase-operations"
+
+interface Initiative {
+  id: string
+  title: string
+  description: string
+  responsible: string
+  porta: "fora" | "dentro"
+  metasCount: number
+  statusCounts: {
+    satisfatorio: number
+    alerta: number
+    critico: number
+    concluido: number
+    naoMonitorado: number
+  }
+  defaultOpen: boolean
+}
 
 interface NewInitiativeModalProps {
   isOpen: boolean
