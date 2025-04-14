@@ -10,8 +10,8 @@ const firebaseConfig = {
   projectId: "ncpi-102ca",
   storageBucket: "ncpi-102ca.firebasestorage.app",
   messagingSenderId: "592471971260",
-  appId: "1:592471971260:web:ab58079af0ec8dadd387b9",
-  measurementId: "G-HPK9RNKNWL"
+  appId: "1:592471971260:web:acea66a4add39211d387b9",
+  measurementId: "G-KR1NKD77R7"
 };
 
 // Initialize Firebase
