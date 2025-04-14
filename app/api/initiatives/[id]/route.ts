@@ -3,10 +3,10 @@ import * as db from '@/lib/local-db';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const initiative = await db.getInitiativeById(params.id);
+    const initiative = await db.getInitiativeById(context.params.id);
     
     if (!initiative) {
       return NextResponse.json(
@@ -27,11 +27,11 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const updates = await request.json();
-    const initiative = await db.updateInitiative(params.id, updates);
+    const initiative = await db.updateInitiative(context.params.id, updates);
     
     return NextResponse.json(initiative);
   } catch (error) {
@@ -45,11 +45,11 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    await db.deleteInitiative(params.id);
-    return new NextResponse(null, { status: 204 });
+    await db.deleteInitiative(context.params.id);
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting initiative:', error);
     return NextResponse.json(
