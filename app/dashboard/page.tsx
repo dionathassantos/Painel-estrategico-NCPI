@@ -16,23 +16,70 @@ interface StatusCounts {
   naoMonitorado: number;
 }
 
-interface InitiativeWithCounts extends Initiative {
-  statusCounts: StatusCounts;
-  metasCount: number;
+interface MetaProps {
+  id: string;
+  status: "satisfatorio" | "alerta" | "critico" | "concluido" | "naoMonitorado";
+  description: string;
   responsible: string;
+  alcance: number;
+  date: string;
 }
+
+interface ResultadoProps {
+  id: string;
+  title: string;
+  metas: MetaProps[];
+}
+
+interface InitiativeCardData {
+  id: string;
+  title: string;
+  description: string;
+  responsible: string;
+  porta: "fora" | "dentro";
+  status: "satisfatorio" | "alerta" | "critico" | "concluido" | "naoMonitorado";
+  resultados: ResultadoProps[];
+  metasCount: number;
+  statusCounts: StatusCounts;
+}
+
+// Função para transformar Initiative em InitiativeCardData
+const transformInitiative = (initiative: Initiative): InitiativeCardData => {
+  return {
+    id: initiative.id,
+    title: initiative.title,
+    description: initiative.description,
+    responsible: initiative.responsible,
+    porta: initiative.porta,
+    status: initiative.status,
+    resultados: initiative.resultados.map(resultado => ({
+      id: resultado.id,
+      title: resultado.title,
+      metas: resultado.metas.map(meta => ({
+        id: meta.id,
+        status: meta.status,
+        description: meta.description,
+        responsible: meta.responsavel,
+        alcance: meta.alcance,
+        date: meta.data
+      }))
+    })),
+    metasCount: initiative.metasCount,
+    statusCounts: initiative.statusCounts
+  };
+};
 
 export default function DashboardPage() {
   const [isNewInitiativeModalOpen, setIsNewInitiativeModalOpen] = useState(false)
   const [activePorta, setActivePorta] = useState<"fora" | "dentro">("fora")
-  const [initiatives, setInitiatives] = useState<InitiativeWithCounts[]>([])
+  const [initiatives, setInitiatives] = useState<InitiativeCardData[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadInitiatives = async () => {
       try {
         const data = await getInitiatives(activePorta)
-        setInitiatives(data as InitiativeWithCounts[])
+        setInitiatives(data.map(transformInitiative))
       } catch (error) {
         console.error("Error loading initiatives:", error)
       } finally {
@@ -46,7 +93,8 @@ export default function DashboardPage() {
   const handleCreateInitiative = async (newInitiative: Omit<Initiative, "id">) => {
     try {
       const id = await createInitiative(newInitiative)
-      setInitiatives([...initiatives, { ...newInitiative, id } as InitiativeWithCounts])
+      const initiativeWithId = { ...newInitiative, id } as Initiative
+      setInitiatives([...initiatives, transformInitiative(initiativeWithId)])
       setIsNewInitiativeModalOpen(false)
     } catch (error) {
       console.error("Error creating initiative:", error)
@@ -56,14 +104,14 @@ export default function DashboardPage() {
   // Calculate total metrics
   const totalMetrics = {
     iniciativas: initiatives.length,
-    resultados: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + (initiative.resultados?.length || 0), 0),
-    metas: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.metasCount, 0),
+    resultados: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + (initiative.resultados?.length || 0), 0),
+    metas: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.metasCount, 0),
     status: {
-      satisfatorio: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.satisfatorio, 0),
-      alerta: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.alerta, 0),
-      critico: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.critico, 0),
-      concluido: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.concluido, 0),
-      naoMonitorado: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.naoMonitorado, 0),
+      satisfatorio: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.satisfatorio, 0),
+      alerta: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.alerta, 0),
+      critico: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.critico, 0),
+      concluido: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.concluido, 0),
+      naoMonitorado: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.naoMonitorado, 0),
     },
   }
 
@@ -210,7 +258,7 @@ export default function DashboardPage() {
             <div className="overflow-x-auto overflow-y-hidden pb-4">
               <div className="space-y-4" style={{ minWidth: "100%", width: "max-content", maxWidth: "100%" }}>
                 {initiatives.length > 0 ? (
-                  initiatives.map((initiative: InitiativeWithCounts) => <InitiativeCard key={initiative.id} {...initiative} />)
+                  initiatives.map((initiative: InitiativeCardData) => <InitiativeCard key={initiative.id} {...initiative} />)
                 ) : (
                   <div className="bg-white rounded-lg shadow-sm p-8 text-center">
                     <p className="text-gray-500">Nenhuma iniciativa encontrada para esta porta.</p>
