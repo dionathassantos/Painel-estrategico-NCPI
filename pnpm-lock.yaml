@@ -114,7 +114,7 @@ importers:
         specifier: 8.5.1
         version: 8.5.1(react@19.1.0)
       firebase:
-        specifier: ^10.8.0
+        specifier: ^10.14.1
         version: 10.14.1
       framer-motion:
         specifier: 12.7.2
@@ -165,6 +165,9 @@ importers:
         specifier: 3.24.2
         version: 3.24.2
     devDependencies:
+      '@types/firebase':
+        specifier: ^3.2.3
+        version: 3.2.3
       '@types/node':
         specifier: 22.14.1
         version: 22.14.1
@@ -1289,6 +1292,10 @@ packages:
 
   '@types/d3-timer@3.0.2':
     resolution: {integrity: sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==}
+
+  '@types/firebase@3.2.3':
+    resolution: {integrity: sha512-fId22ajZ7CkTMnm/FveFcEGb7Trv97JsUk1Dvc1vIFDiwpVSGKeTUyBOA2Tr2riXe53ZP526G9WDCrq3ulE7tw==}
+    deprecated: This is a stub types definition. firebase provides its own type definitions, so you do not need this installed.
 
   '@types/node@22.14.1':
     resolution: {integrity: sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==}
@@ -3386,6 +3393,12 @@ snapshots:
   '@types/d3-time@3.0.4': {}
 
   '@types/d3-timer@3.0.2': {}
+
+  '@types/firebase@3.2.3':
+    dependencies:
+      firebase: 10.14.1
+    transitivePeerDependencies:
+      - '@react-native-async-storage/async-storage'
 
   '@types/node@22.14.1':
     dependencies:
