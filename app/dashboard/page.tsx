@@ -8,17 +8,31 @@ import { Plus, Star, Flag, Target, ThumbsUp, SmileIcon, Frown, AlertCircle } fro
 import Image from "next/image"
 import { getInitiatives, createInitiative, type Initiative } from "@/lib/firebase-operations"
 
+interface StatusCounts {
+  satisfatorio: number;
+  alerta: number;
+  critico: number;
+  concluido: number;
+  naoMonitorado: number;
+}
+
+interface InitiativeWithCounts extends Initiative {
+  statusCounts: StatusCounts;
+  metasCount: number;
+  responsible: string;
+}
+
 export default function DashboardPage() {
   const [isNewInitiativeModalOpen, setIsNewInitiativeModalOpen] = useState(false)
   const [activePorta, setActivePorta] = useState<"fora" | "dentro">("fora")
-  const [initiatives, setInitiatives] = useState<Initiative[]>([])
+  const [initiatives, setInitiatives] = useState<InitiativeWithCounts[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadInitiatives = async () => {
       try {
         const data = await getInitiatives(activePorta)
-        setInitiatives(data)
+        setInitiatives(data as InitiativeWithCounts[])
       } catch (error) {
         console.error("Error loading initiatives:", error)
       } finally {
@@ -32,7 +46,7 @@ export default function DashboardPage() {
   const handleCreateInitiative = async (newInitiative: Omit<Initiative, "id">) => {
     try {
       const id = await createInitiative(newInitiative)
-      setInitiatives([...initiatives, { ...newInitiative, id }])
+      setInitiatives([...initiatives, { ...newInitiative, id } as InitiativeWithCounts])
       setIsNewInitiativeModalOpen(false)
     } catch (error) {
       console.error("Error creating initiative:", error)
@@ -42,14 +56,14 @@ export default function DashboardPage() {
   // Calculate total metrics
   const totalMetrics = {
     iniciativas: initiatives.length,
-    resultados: initiatives.reduce((acc, initiative) => acc + (initiative.resultados?.length || 0), 0),
-    metas: initiatives.reduce((acc, initiative) => acc + initiative.metasCount, 0),
+    resultados: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + (initiative.resultados?.length || 0), 0),
+    metas: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.metasCount, 0),
     status: {
-      satisfatorio: initiatives.reduce((acc, initiative) => acc + initiative.statusCounts.satisfatorio, 0),
-      alerta: initiatives.reduce((acc, initiative) => acc + initiative.statusCounts.alerta, 0),
-      critico: initiatives.reduce((acc, initiative) => acc + initiative.statusCounts.critico, 0),
-      concluido: initiatives.reduce((acc, initiative) => acc + initiative.statusCounts.concluido, 0),
-      naoMonitorado: initiatives.reduce((acc, initiative) => acc + initiative.statusCounts.naoMonitorado, 0),
+      satisfatorio: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.satisfatorio, 0),
+      alerta: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.alerta, 0),
+      critico: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.critico, 0),
+      concluido: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.concluido, 0),
+      naoMonitorado: initiatives.reduce((acc: number, initiative: InitiativeWithCounts) => acc + initiative.statusCounts.naoMonitorado, 0),
     },
   }
 
@@ -196,7 +210,7 @@ export default function DashboardPage() {
             <div className="overflow-x-auto overflow-y-hidden pb-4">
               <div className="space-y-4" style={{ minWidth: "100%", width: "max-content", maxWidth: "100%" }}>
                 {initiatives.length > 0 ? (
-                  initiatives.map((initiative) => <InitiativeCard key={initiative.id} {...initiative} />)
+                  initiatives.map((initiative: InitiativeWithCounts) => <InitiativeCard key={initiative.id} {...initiative} />)
                 ) : (
                   <div className="bg-white rounded-lg shadow-sm p-8 text-center">
                     <p className="text-gray-500">Nenhuma iniciativa encontrada para esta porta.</p>
