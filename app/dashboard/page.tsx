@@ -6,7 +6,6 @@ import { InitiativeCard } from "@/components/initiative-card"
 import { NewInitiativeModal } from "@/components/new-initiative_modal"
 import { Plus, Star, Flag, Target, ThumbsUp, SmileIcon, Frown, AlertCircle } from "lucide-react"
 import Image from "next/image"
-import { getInitiatives, createInitiative, type Initiative } from "@/lib/firebase-operations"
 
 interface StatusCounts {
   satisfatorio: number;
@@ -43,32 +42,6 @@ interface InitiativeCardData {
   statusCounts: StatusCounts;
 }
 
-// Função para transformar Initiative em InitiativeCardData
-const transformInitiative = (initiative: Initiative): InitiativeCardData => {
-  return {
-    id: initiative.id,
-    title: initiative.title,
-    description: initiative.description,
-    responsible: initiative.responsible,
-    porta: initiative.porta,
-    status: initiative.status,
-    resultados: initiative.resultados.map(resultado => ({
-      id: resultado.id,
-      title: resultado.title,
-      metas: resultado.metas.map(meta => ({
-        id: meta.id,
-        status: meta.status,
-        description: meta.description,
-        responsible: meta.responsavel,
-        alcance: meta.alcance,
-        date: meta.data
-      }))
-    })),
-    metasCount: initiative.metasCount,
-    statusCounts: initiative.statusCounts
-  };
-};
-
 export default function DashboardPage() {
   const [isNewInitiativeModalOpen, setIsNewInitiativeModalOpen] = useState(false)
   const [activePorta, setActivePorta] = useState<"fora" | "dentro">("fora")
@@ -78,8 +51,10 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadInitiatives = async () => {
       try {
-        const data = await getInitiatives(activePorta)
-        setInitiatives(data.map(transformInitiative))
+        const response = await fetch(`/api/initiatives?porta=${activePorta}`);
+        if (!response.ok) throw new Error('Failed to fetch initiatives');
+        const data = await response.json();
+        setInitiatives(data);
       } catch (error) {
         console.error("Error loading initiatives:", error)
       } finally {
@@ -90,12 +65,22 @@ export default function DashboardPage() {
     loadInitiatives()
   }, [activePorta])
 
-  const handleCreateInitiative = async (newInitiative: Omit<Initiative, "id">) => {
+  const handleCreateInitiative = async (newInitiative: Omit<InitiativeCardData, "id">) => {
     try {
-      const id = await createInitiative(newInitiative)
-      const initiativeWithId = { ...newInitiative, id } as Initiative
-      setInitiatives([...initiatives, transformInitiative(initiativeWithId)])
-      setIsNewInitiativeModalOpen(false)
+      const response = await fetch('/api/initiatives', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newInitiative),
+      });
+
+      if (!response.ok) throw new Error('Failed to create initiative');
+      
+      const { id } = await response.json();
+      const initiativeWithId = { ...newInitiative, id } as InitiativeCardData;
+      setInitiatives([...initiatives, initiativeWithId]);
+      setIsNewInitiativeModalOpen(false);
     } catch (error) {
       console.error("Error creating initiative:", error)
     }
