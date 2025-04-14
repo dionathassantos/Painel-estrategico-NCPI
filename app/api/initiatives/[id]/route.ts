@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import * as db from '@/lib/local-db';
 
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
     const initiative = await db.getInitiativeById(context.params.id);
@@ -27,7 +33,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
     const updates = await request.json();
@@ -45,7 +51,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
     await db.deleteInitiative(context.params.id);
