@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as db from '@/lib/local-db';
 
-type RouteContext = {
-  params: {
-    id: string;
-  };
+type Params = {
+  id: string;
 };
 
 export async function GET(
   request: NextRequest,
-  context: RouteContext
+  { params }: { params: Params }
 ): Promise<NextResponse> {
   try {
-    const initiative = await db.getInitiativeById(context.params.id);
+    const initiative = await db.getInitiativeById(params.id);
     
     if (!initiative) {
       return NextResponse.json(
@@ -33,11 +31,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: RouteContext
+  { params }: { params: Params }
 ): Promise<NextResponse> {
   try {
     const updates = await request.json();
-    const initiative = await db.updateInitiative(context.params.id, updates);
+    const initiative = await db.updateInitiative(params.id, updates);
     
     return NextResponse.json(initiative);
   } catch (error) {
@@ -51,10 +49,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext
+  { params }: { params: Params }
 ): Promise<NextResponse> {
   try {
-    await db.deleteInitiative(context.params.id);
+    await db.deleteInitiative(params.id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting initiative:', error);
