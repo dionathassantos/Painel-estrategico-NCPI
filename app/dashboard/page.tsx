@@ -127,10 +127,7 @@ export default function DashboardPage() {
               </h2>
             </div>
 
-            {/* Brazil map outline */}
-            <div className="absolute right-0 top-0 opacity-30">
-              <Image src="/brazil-outline-map.png" alt="Brazil Map Outline" width={150} height={100} />
-            </div>
+           
           </div>
 
           {/* Metrics and Status Section - Row 2 */}
