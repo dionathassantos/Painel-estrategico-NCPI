@@ -150,37 +150,47 @@ export default function DashboardPage() {
 
               <div className="flex justify-between items-center px-4">
                 {/* Satisfatório */}
-                <div className="flex flex-col items-center">
-                  <StatusIcon status="satisfatorio" size="lg" />
-                  <span className="text-3xl font-bold mt-1">{totalMetrics.status.satisfatorio}</span>
+                <div className="grid grid-cols-[auto,1fr] gap-x-3 items-center">
+                  <div className="row-span-2 flex items-center">
+                    <StatusIcon status="satisfatorio" size="lg" />
+                  </div>
+                  <span className="text-3xl font-bold">{totalMetrics.status.satisfatorio}</span>
                   <p className="text-[10px] uppercase font-bold">SATISFATÓRIO</p>
                 </div>
 
                 {/* Alerta */}
-                <div className="flex flex-col items-center">
-                  <StatusIcon status="alerta" size="lg" />
-                  <span className="text-3xl font-bold mt-1">{totalMetrics.status.alerta}</span>
+                <div className="grid grid-cols-[auto,1fr] gap-x-3 items-center">
+                  <div className="row-span-2 flex items-center">
+                    <StatusIcon status="alerta" size="lg" />
+                  </div>
+                  <span className="text-3xl font-bold">{totalMetrics.status.alerta}</span>
                   <p className="text-[10px] uppercase font-bold">ALERTA</p>
                 </div>
 
                 {/* Crítico */}
-                <div className="flex flex-col items-center">
-                  <StatusIcon status="critico" size="lg" />
-                  <span className="text-3xl font-bold mt-1">{totalMetrics.status.critico}</span>
+                <div className="grid grid-cols-[auto,1fr] gap-x-3 items-center">
+                  <div className="row-span-2 flex items-center">
+                    <StatusIcon status="critico" size="lg" />
+                  </div>
+                  <span className="text-3xl font-bold">{totalMetrics.status.critico}</span>
                   <p className="text-[10px] uppercase font-bold">CRÍTICO</p>
                 </div>
 
                 {/* Concluídos */}
-                <div className="flex flex-col items-center">
-                  <StatusIcon status="concluido" size="lg" />
-                  <span className="text-3xl font-bold mt-1">{totalMetrics.status.concluido}</span>
+                <div className="grid grid-cols-[auto,1fr] gap-x-3 items-center">
+                  <div className="row-span-2 flex items-center">
+                    <StatusIcon status="concluido" size="lg" />
+                  </div>
+                  <span className="text-3xl font-bold">{totalMetrics.status.concluido}</span>
                   <p className="text-[10px] uppercase font-bold">CONCLUÍDOS</p>
                 </div>
 
                 {/* Não Monitorados */}
-                <div className="flex flex-col items-center">
-                  <StatusIcon status="naoMonitorado" size="lg" />
-                  <span className="text-3xl font-bold mt-1">{totalMetrics.status.naoMonitorado}</span>
+                <div className="grid grid-cols-[auto,1fr] gap-x-3 items-center">
+                  <div className="row-span-2 flex items-center">
+                    <StatusIcon status="naoMonitorado" size="lg" />
+                  </div>
+                  <span className="text-3xl font-bold">{totalMetrics.status.naoMonitorado}</span>
                   <p className="text-[10px] uppercase font-bold">NÃO MONITORADOS</p>
                 </div>
               </div>
