@@ -106,34 +106,34 @@ export default function DashboardPage() {
               <div className="absolute left-0 top-8 bottom-0 w-0.5 bg-[#A6CE39]"></div>
 
               {/* Iniciativas Card */}
-              <div className="flex items-center bg-white border border-gray-200 h-[50px] rounded-md shadow-sm mb-4 relative">
-                {/* Conector horizontal */}
+              <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[45px] rounded-b-[13px] absolute" style={{ width: '189px', left: 'calc(50% - 189px/2 - 360.5px)', top: '275px' }}>
+                {/* Connector to Resultados */}
                 <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
-                <div className="ml-4 text-[#A6CE39]">
-                  <Star className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
+                <div className="ml-4 text-white">
+                  <Star className="h-5 w-5 fill-[#A6CE39]" />
                 </div>
-                <span className="ml-3 text-[#04695E] text-sm font-medium">Iniciativas</span>
-                <span className="ml-auto mr-6 text-[#04695E] text-2xl font-bold">{totalMetrics.iniciativas}</span>
+                <span className="ml-3 text-white text-sm font-medium">Iniciativas</span>
+                <span className="ml-auto mr-6 text-white text-2xl font-bold">{totalMetrics.iniciativas}</span>
               </div>
 
               {/* Resultados Card */}
-              <div className="flex items-center bg-white border border-gray-200 h-[50px] rounded-md shadow-sm mb-4 ml-6 relative">
-                {/* Conector horizontal */}
+              <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[45px] rounded-b-[13px] absolute" style={{ width: '229px', left: 'calc(50% - 229px/2 - 360.5px)', top: '320px' }}>
+                {/* Connector to Metas */}
                 <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
-                {/* Conector curvo */}
+                {/* Connector curvo */}
                 <div className="absolute -left-6 -top-4 w-[15px] h-[29px] border-l border-t border-[#A6CE39] rounded-tl-[7px]"></div>
-                <div className="ml-4 text-[#A6CE39]">
-                  <Flag className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
+                <div className="ml-4 text-white">
+                  <Flag className="h-5 w-5 fill-[#A6CE39]" />
                 </div>
-                <span className="ml-3 text-[#04695E] text-sm font-medium">Resultados</span>
-                <span className="ml-auto mr-6 text-[#04695E] text-2xl font-bold">{totalMetrics.resultados}</span>
+                <span className="ml-3 text-white text-sm font-medium">Resultados</span>
+                <span className="ml-auto mr-6 text-white text-2xl font-bold">{totalMetrics.resultados}</span>
               </div>
 
               {/* Metas Card */}
-              <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[50px] rounded-md shadow-sm ml-12 relative">
-                {/* Conector horizontal */}
+              <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[45px] rounded-b-[13px] absolute" style={{ width: '268px', left: 'calc(50% - 268px/2 - 360.5px)', top: '365px' }}>
+                {/* Connector to Resultados */}
                 <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
-                {/* Conector curvo */}
+                {/* Connector curvo */}
                 <div className="absolute -left-6 -top-4 w-[15px] h-[29px] border-l border-t border-[#A6CE39] rounded-tl-[7px]"></div>
                 <div className="ml-4 text-white">
                   <Target className="h-5 w-5 text-[#A6CE39]" />
@@ -146,7 +146,7 @@ export default function DashboardPage() {
 
           {/* Status das Metas à direita */}
           <div className="col-span-9">
-            <div className="bg-[#04695E] rounded-tr-[50px] p-5 text-white h-full">
+            <div className="bg-[#04695E] rounded-tr-[50px] absolute" style={{ width: '853px', height: '152px', left: 'calc(50% - 853px/2 + 179.5px)', top: '169px' }}>
               <div className="flex items-center mb-6">
                 <h3 className="text-sm font-bold uppercase border-l-4 border-[#A6CE39] pl-3">STATUS DAS METAS</h3>
                 <div className="w-0.5 h-4 bg-[#A6CE39] mx-4"></div>
