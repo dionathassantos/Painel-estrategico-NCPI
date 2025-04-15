@@ -78,7 +78,7 @@ export default function DashboardPage() {
         {/* Header com logo e título */}
         <div className="flex justify-between items-start mb-8">
           <div className="flex items-center">
-            <Image src="/images/Logo-cor-NCPI.svg" alt="NCPI Logo" width={100} height={40} className="mr-6" />
+            
             <div className="border-l-4 border-[#A6CE39] pl-4">
               <h1 className="text-[#04695E] text-2xl font-bold">PAINEL ESTRATÉGICO</h1>
               <h2 className="text-[#A6CE39] text-base font-medium">
