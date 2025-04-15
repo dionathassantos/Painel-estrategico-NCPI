@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 
@@ -40,100 +40,105 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#04695E] flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl flex flex-col md:flex-row items-center">
-        {/* Left illustration */}
-        <div className="hidden md:block md:w-1/4">
-          <Image
-            src="/placeholder.svg?height=300&width=200"
-            alt="Illustration"
-            width={200}
-            height={300}
-            className="max-w-full"
-          />
-        </div>
-
-        {/* Login form */}
-        <div className="w-full max-w-md bg-white rounded-[40px] p-8 md:p-12 relative z-10">
-          <div className="flex justify-center mb-8">
-            <Image src="/placeholder.svg?height=60&width=120" alt="NCPI Logo" width={120} height={60} />
+    <div className="flex min-h-screen">
+      {/* Left side - Login Form */}
+      <div className="flex-1 flex flex-col justify-center items-center p-8 bg-white">
+        <div className="w-full max-w-md space-y-8">
+          <div className="flex justify-center">
+            <Image src="/images/Logo-cor-NCPI.svg" alt="NCPI Logo" width={200} height={80} className="h-auto" />
           </div>
-
-          <h1 className="text-[#04695E] text-2xl font-medium text-center mb-8">Login</h1>
-
-          <form onSubmit={handleLogin}>
-            <div className="mb-6">
-              <label htmlFor="email" className="block text-gray-600 mb-2">
-                E-Mail
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#04695E]"
-                required
-              />
-            </div>
-
-            <div className="mb-8">
-              <label htmlFor="password" className="block text-gray-600 mb-2">
-                Senha
-              </label>
-              <div className="relative">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[#04695E]">Acesse sua conta</h2>
+          <p className="mt-2 text-center text-sm text-gray-600">Entre com suas credenciais para acessar o painel</p>
+          <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+            <div className="-space-y-px rounded-md shadow-sm">
+              <div>
+                <label htmlFor="email-address" className="sr-only">
+                  Email
+                </label>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="relative block w-full rounded-t-md border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-[#0DBAAD] sm:text-sm sm:leading-6"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  Senha
+                </label>
+                <input
                   id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className="relative block w-full rounded-b-md border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-[#0DBAAD] sm:text-sm sm:leading-6"
+                  placeholder="Senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#04695E]"
-                  required
                 />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#0DBAAD] text-white py-3 px-4 rounded-full hover:bg-[#04695E] transition-colors disabled:opacity-70"
-            >
-              {isLoading ? "Entrando..." : "Entrar"}
-            </button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-[#0DBAAD] focus:ring-[#0DBAAD]"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Lembrar-me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <a href="#" className="font-medium text-[#0DBAAD] hover:text-[#04695E]">
+                  Esqueceu sua senha?
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="group relative flex w-full justify-center rounded-md bg-[#0DBAAD] px-3 py-3 text-sm font-semibold text-white hover:bg-[#04695E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0DBAAD]"
+              >
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Entrando...
+                  </span>
+                ) : (
+                  "Entrar"
+                )}
+              </button>
+            </div>
           </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsRegistrationModalOpen(true)}
-              className="text-[#04695E] hover:underline focus:outline-none"
-            >
-              Solicitar acesso
-            </button>
-          </div>
         </div>
+      </div>
 
-        {/* Right content */}
-        <div className="hidden md:flex md:w-2/5 md:flex-col md:items-center md:pl-12">
-          <div className="text-white mb-8">
-            <h2 className="text-3xl font-bold mb-2">
-              Olá! Bem-vindo ao
-              <br />
-              painel de indicadores
-            </h2>
+      {/* Right side - Illustration */}
+      <div className="hidden lg:flex lg:flex-1 bg-[#04695E] justify-center items-center p-8">
+        <div className="max-w-lg">
+          <div className="flex justify-center mb-8">
+            <Image src="/images/Abraco.svg" alt="Abraço Ilustração" width={300} height={300} className="h-auto" />
           </div>
-          <Image
-            src="/placeholder.svg?height=300&width=300"
-            alt="Dashboard Illustration"
-            width={300}
-            height={300}
-            className="max-w-full"
-          />
+          <div className="flex justify-center">
+            <Image
+              src="/images/Breastfeeding-cuate.svg"
+              alt="Amamentação Ilustração"
+              width={300}
+              height={300}
+              className="h-auto"
+            />
+          </div>
         </div>
       </div>
 

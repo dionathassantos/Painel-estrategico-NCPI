@@ -3,171 +3,147 @@
 import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { InitiativeCard } from "@/components/initiative-card"
-import { NewInitiativeModal } from "@/components/new-initiative_modal"
-import { Plus, Star, Flag, Target, ThumbsUp, SmileIcon, Frown, AlertCircle } from "lucide-react"
+import { NewInitiativeModal } from "@/components/new-initiative-modal"
+import { Plus, Star, Flag, Target } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import { databaseService } from "@/lib/database"
+import { StatusIcon } from "@/components/status-icons"
 import Image from "next/image"
-
-interface StatusCounts {
-  satisfatorio: number;
-  alerta: number;
-  critico: number;
-  concluido: number;
-  naoMonitorado: number;
-}
-
-interface MetaProps {
-  id: string;
-  status: "satisfatorio" | "alerta" | "critico" | "concluido" | "naoMonitorado";
-  description: string;
-  responsible: string;
-  alcance: number;
-  date: string;
-}
-
-interface ResultadoProps {
-  id: string;
-  title: string;
-  metas: MetaProps[];
-}
-
-interface InitiativeCardData {
-  id: string;
-  title: string;
-  description: string;
-  responsible: string;
-  porta: "fora" | "dentro";
-  status: "satisfatorio" | "alerta" | "critico" | "concluido" | "naoMonitorado";
-  resultados: ResultadoProps[];
-  metasCount: number;
-  statusCounts: StatusCounts;
-}
 
 export default function DashboardPage() {
   const [isNewInitiativeModalOpen, setIsNewInitiativeModalOpen] = useState(false)
-  const [activePorta, setActivePorta] = useState<"fora" | "dentro">("fora")
-  const [initiatives, setInitiatives] = useState<InitiativeCardData[]>([])
+  const searchParams = useSearchParams()
+  const portaParam = searchParams.get("porta") || "fora"
+  const [activePorta, setActivePorta] = useState<"fora" | "dentro">(portaParam as "fora" | "dentro")
+  const [initiatives, setInitiatives] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Carregar iniciativas do banco de dados
   useEffect(() => {
-    const loadInitiatives = async () => {
+    const fetchInitiatives = async () => {
       try {
-        const response = await fetch(`/api/initiatives?porta=${activePorta}`);
-        if (!response.ok) throw new Error('Failed to fetch initiatives');
-        const data = await response.json();
-        setInitiatives(data);
+        setLoading(true)
+
+        // Opção 1: Usar a API
+        const response = await fetch(`/api/iniciativas?porta=Porta para ${activePorta}`)
+        if (!response.ok) {
+          throw new Error("Falha ao buscar iniciativas")
+        }
+        const data = await response.json()
+        setInitiatives(data)
+
+        // Opção 2: Usar o serviço diretamente (para desenvolvimento)
+        // const iniciativas = await databaseService.getIniciativas(`Porta para ${activePorta}`);
+        // const formattedIniciativas = databaseService.convertToComponentFormat(iniciativas);
+        // setInitiatives(formattedIniciativas);
       } catch (error) {
-        console.error("Error loading initiatives:", error)
+        console.error("Erro ao buscar iniciativas:", error)
+        // Usar dados mockados em caso de erro
+        const iniciativas = await databaseService.getIniciativas(`Porta para ${activePorta}`)
+        const formattedIniciativas = databaseService.convertToComponentFormat(iniciativas)
+        setInitiatives(formattedIniciativas)
       } finally {
         setLoading(false)
       }
     }
 
-    loadInitiatives()
+    fetchInitiatives()
   }, [activePorta])
 
-  const handleCreateInitiative = async (newInitiative: Omit<InitiativeCardData, "id">) => {
-    try {
-      const response = await fetch('/api/initiatives', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newInitiative),
-      });
+  // Atualizar porta ativa quando o parâmetro de URL mudar
+  useEffect(() => {
+    setActivePorta(portaParam as "fora" | "dentro")
+  }, [portaParam])
 
-      if (!response.ok) throw new Error('Failed to create initiative');
-      
-      const { id } = await response.json();
-      const initiativeWithId = { ...newInitiative, id } as InitiativeCardData;
-      setInitiatives([...initiatives, initiativeWithId]);
-      setIsNewInitiativeModalOpen(false);
-    } catch (error) {
-      console.error("Error creating initiative:", error)
-    }
-  }
+  // Filtrar iniciativas com base na porta ativa
+  const filteredInitiatives = initiatives
 
-  // Calculate total metrics
+  // Calcular métricas totais
   const totalMetrics = {
-    iniciativas: initiatives.length,
-    resultados: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + (initiative.resultados?.length || 0), 0),
-    metas: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.metasCount, 0),
+    iniciativas: filteredInitiatives.length,
+    resultados: filteredInitiatives.reduce((acc, initiative) => acc + (initiative.resultados?.length || 0), 0),
+    metas: filteredInitiatives.reduce((acc, initiative) => acc + initiative.metasCount, 0),
     status: {
-      satisfatorio: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.satisfatorio, 0),
-      alerta: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.alerta, 0),
-      critico: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.critico, 0),
-      concluido: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.concluido, 0),
-      naoMonitorado: initiatives.reduce((acc: number, initiative: InitiativeCardData) => acc + initiative.statusCounts.naoMonitorado, 0),
+      satisfatorio: filteredInitiatives.reduce((acc, initiative) => acc + initiative.statusCounts.satisfatorio, 0),
+      alerta: filteredInitiatives.reduce((acc, initiative) => acc + initiative.statusCounts.alerta, 0),
+      critico: filteredInitiatives.reduce((acc, initiative) => acc + initiative.statusCounts.critico, 0),
+      concluido: filteredInitiatives.reduce((acc, initiative) => acc + initiative.statusCounts.concluido, 0),
+      naoMonitorado: filteredInitiatives.reduce((acc, initiative) => acc + initiative.statusCounts.naoMonitorado, 0),
     },
-  }
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#04695E]"></div>
-        </div>
-      </DashboardLayout>
-    )
   }
 
   return (
     <DashboardLayout>
-      <div className="pl-0 pr-6 py-6 lg:pr-8 lg:py-8">
-        {/* Main grid layout */}
-        <div className="grid grid-cols-1 grid-rows-[auto_auto_1fr] gap-6 relative">
-          {/* Header with Brazil map - Row 1 */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between relative">
-            <div>
-              <div className="flex items-center">
-                <div className="border-l-4 border-[#A6CE39] pr-3"></div>
-                <h1 className="text-[#04695E] text-2xl lg:text-3xl font-bold">PAINEL ESTRATÉGICO</h1>
-              </div>
-              <h2 className="text-[#A6CE39] text-base lg:text-lg font-medium mt-1 ml-6">
+      <div className="p-6 lg:p-8 h-full">
+        {/* Header com logo e título */}
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex items-center">
+            <Image src="/images/Logo-cor-NCPI.svg" alt="NCPI Logo" width={100} height={40} className="mr-6" />
+            <div className="border-l-4 border-[#A6CE39] pl-4">
+              <h1 className="text-[#04695E] text-2xl font-bold">PAINEL ESTRATÉGICO</h1>
+              <h2 className="text-[#A6CE39] text-base font-medium">
                 PORTA PARA {activePorta.toUpperCase()} | 2025 - 2027
               </h2>
             </div>
-
-           
           </div>
+          <div className="flex items-center">
+            <Image
+              src="/brazil-outline-map.png"
+              alt="Mapa do Brasil"
+              width={120}
+              height={80}
+              className="opacity-50"
+            />
+          </div>
+        </div>
 
-          {/* Metrics and Status Section - Row 2 */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            {/* Left side - Metrics Cards with cascading effect */}
-            <div className="lg:col-span-4 flex flex-col items-end">
-              {/* Container for the cascading cards */}
-              <div className="flex flex-col gap-2 relative">
-                {/* Iniciativas Card */}
-                <div className="flex items-center bg-white border border-gray-200 h-[45px] w-[268px] rounded-md shadow-sm">
-                  <div className="ml-3 text-[#A6CE39]">
-                    <Star className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
-                  </div>
-                  <span className="ml-2 text-[#04695E] text-sm font-medium">Iniciativas</span>
-                  <span className="ml-auto mr-4 text-[#04695E] text-2xl font-bold">{totalMetrics.iniciativas}</span>
-                </div>
+        {/* Grid principal com métricas e status */}
+        <div className="grid grid-cols-12 gap-6 mb-8">
+          {/* Métricas à esquerda */}
+          <div className="col-span-4">
+            <div className="relative pl-6">
+              {/* Linha vertical conectora */}
+              <div className="absolute left-0 top-8 bottom-0 w-0.5 bg-[#A6CE39] h-[calc(100%-30px)]"></div>
 
-                {/* Resultados Card - positioned relative to the first card */}
-                <div className="flex items-center bg-white border border-gray-200 h-[45px] w-[229px] rounded-md shadow-sm ml-auto">
-                  <div className="ml-3 text-[#A6CE39]">
-                    <Flag className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
-                  </div>
-                  <span className="ml-2 text-[#04695E] text-sm font-medium">Resultados</span>
-                  <span className="ml-auto mr-4 text-[#04695E] text-2xl font-bold">{totalMetrics.resultados}</span>
+              {/* Iniciativas Card */}
+              <div className="flex items-center bg-white border border-gray-200 h-[50px] rounded-md shadow-sm mb-4 relative">
+                {/* Linha horizontal conectora */}
+                <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
+                <div className="ml-4 text-[#A6CE39]">
+                  <Star className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
                 </div>
+                <span className="ml-3 text-[#04695E] text-sm font-medium">Iniciativas</span>
+                <span className="ml-auto mr-6 text-[#04695E] text-2xl font-bold">{totalMetrics.iniciativas}</span>
+              </div>
 
-                {/* Metas Card - positioned relative to the second card */}
-                <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[45px] w-[189px] rounded-md shadow-sm ml-auto">
-                  <div className="ml-3 text-white">
-                    <Target className="h-5 w-5 text-[#A6CE39]" />
-                  </div>
-                  <span className="ml-2 text-white text-sm font-medium">Metas</span>
-                  <span className="ml-auto mr-4 text-white text-2xl font-bold">{totalMetrics.metas}</span>
+              {/* Resultados Card */}
+              <div className="flex items-center bg-white border border-gray-200 h-[50px] rounded-md shadow-sm mb-4 ml-6 relative">
+                {/* Linha horizontal conectora */}
+                <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
+                <div className="ml-4 text-[#A6CE39]">
+                  <Flag className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
                 </div>
+                <span className="ml-3 text-[#04695E] text-sm font-medium">Resultados</span>
+                <span className="ml-auto mr-6 text-[#04695E] text-2xl font-bold">{totalMetrics.resultados}</span>
+              </div>
+
+              {/* Metas Card */}
+              <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[50px] rounded-md shadow-sm ml-12 relative">
+                {/* Linha horizontal conectora */}
+                <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
+                <div className="ml-4 text-white">
+                  <Target className="h-5 w-5 text-[#A6CE39]" />
+                </div>
+                <span className="ml-3 text-white text-sm font-medium">Metas</span>
+                <span className="ml-auto mr-6 text-white text-2xl font-bold">{totalMetrics.metas}</span>
               </div>
             </div>
+          </div>
 
-            {/* Right side - Status Card */}
-            <div className="lg:col-span-8 bg-[#04695E] rounded-tr-[50px] p-5 text-white h-[152px] w-full">
-              <div className="flex items-center mb-4">
+          {/* Status das Metas à direita */}
+          <div className="col-span-8">
+            <div className="bg-[#04695E] rounded-tr-[50px] p-5 text-white h-full">
+              <div className="flex items-center mb-6">
                 <h3 className="text-sm font-bold uppercase border-l-4 border-[#A6CE39] pl-3">STATUS DAS METAS</h3>
                 <div className="w-0.5 h-4 bg-[#A6CE39] mx-4"></div>
               </div>
@@ -175,87 +151,76 @@ export default function DashboardPage() {
               <div className="flex justify-between items-center px-4">
                 {/* Satisfatório */}
                 <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-[#03B71A] border-2 border-white flex items-center justify-center">
-                    <SmileIcon className="w-8 h-8 text-white" />
-                  </div>
+                  <StatusIcon status="satisfatorio" size="lg" />
                   <span className="text-3xl font-bold mt-1">{totalMetrics.status.satisfatorio}</span>
                   <p className="text-[10px] uppercase font-bold">SATISFATÓRIO</p>
                 </div>
 
                 {/* Alerta */}
                 <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-[#EFA400] border-2 border-white flex items-center justify-center">
-                    <AlertCircle className="w-8 h-8 text-white" />
-                  </div>
+                  <StatusIcon status="alerta" size="lg" />
                   <span className="text-3xl font-bold mt-1">{totalMetrics.status.alerta}</span>
                   <p className="text-[10px] uppercase font-bold">ALERTA</p>
                 </div>
 
                 {/* Crítico */}
                 <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-[#FC0228] border-2 border-white flex items-center justify-center">
-                    <Frown className="w-8 h-8 text-white" />
-                  </div>
+                  <StatusIcon status="critico" size="lg" />
                   <span className="text-3xl font-bold mt-1">{totalMetrics.status.critico}</span>
                   <p className="text-[10px] uppercase font-bold">CRÍTICO</p>
                 </div>
 
                 {/* Concluídos */}
                 <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-[#01A3F7] border-2 border-white flex items-center justify-center">
-                    <ThumbsUp className="w-8 h-8 text-white" />
-                  </div>
+                  <StatusIcon status="concluido" size="lg" />
                   <span className="text-3xl font-bold mt-1">{totalMetrics.status.concluido}</span>
                   <p className="text-[10px] uppercase font-bold">CONCLUÍDOS</p>
                 </div>
 
                 {/* Não Monitorados */}
                 <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-[#F4F4EF] border-2 border-[#F4F4EF] flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full border-2 border-[#58595B] flex items-center justify-center">
-                      <div className="w-5 h-5 rounded-full border-[2px] border-[#58595B]"></div>
-                    </div>
-                  </div>
+                  <StatusIcon status="naoMonitorado" size="lg" />
                   <span className="text-3xl font-bold mt-1">{totalMetrics.status.naoMonitorado}</span>
                   <p className="text-[10px] uppercase font-bold">NÃO MONITORADOS</p>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Initiatives Section - Row 3 */}
-          <div className="mt-4 ml-3">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[#04695E] text-xl font-semibold">Iniciativas</h2>
-              <button
-                onClick={() => setIsNewInitiativeModalOpen(true)}
-                className="bg-[#0DBAAD] hover:bg-[#04695E] transition-colors text-white px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-sm"
-              >
-                Nova Iniciativa
-                <Plus className="ml-2 h-4 w-4" />
-              </button>
-            </div>
+        {/* Seção de Iniciativas */}
+        <div className="bg-[#F4F4EF]/50 rounded-lg p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-[#04695E] text-xl font-semibold">Iniciativas</h2>
+            <button
+              onClick={() => setIsNewInitiativeModalOpen(true)}
+              className="bg-[#0DBAAD] hover:bg-[#04695E] transition-colors text-white px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-sm"
+            >
+              Nova Iniciativa
+              <Plus className="ml-2 h-4 w-4" />
+            </button>
+          </div>
 
-            {/* Initiatives Cards with side-scrolling */}
-            <div className="overflow-x-auto overflow-y-hidden pb-4">
-              <div className="space-y-4" style={{ minWidth: "100%", width: "max-content", maxWidth: "100%" }}>
-                {initiatives.length > 0 ? (
-                  initiatives.map((initiative: InitiativeCardData) => <InitiativeCard key={initiative.id} {...initiative} />)
-                ) : (
-                  <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                    <p className="text-gray-500">Nenhuma iniciativa encontrada para esta porta.</p>
-                  </div>
-                )}
+          {/* Lista de Iniciativas */}
+          <div className="space-y-4">
+            {loading ? (
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <p className="text-gray-500">Carregando iniciativas...</p>
               </div>
-            </div>
+            ) : filteredInitiatives.length > 0 ? (
+              filteredInitiatives.map((initiative) => <InitiativeCard key={initiative.id} {...initiative} />)
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <p className="text-gray-500">Nenhuma iniciativa encontrada para esta porta.</p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* New Initiative Modal */}
+        {/* Modal de Nova Iniciativa */}
         <NewInitiativeModal
           isOpen={isNewInitiativeModalOpen}
           onClose={() => setIsNewInitiativeModalOpen(false)}
-          onSave={handleCreateInitiative}
           porta={activePorta}
         />
       </div>

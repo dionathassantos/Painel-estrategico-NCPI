@@ -7,19 +7,21 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import {
-  Bell,
   ChevronDown,
+  ChevronUp,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
   LogOut,
   Settings,
-  Calendar,
-  User,
+  Search,
+  LayoutDashboard,
   BarChart2,
-  Users,
   LineChart,
+  Users,
+  Calendar,
   FileText,
+  HelpCircle,
+  Bell,
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
@@ -34,23 +36,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const searchParams = useSearchParams()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [showNotifications, setShowNotifications] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(true) // For demo purposes, set to true
   const [dashboardSubmenuOpen, setDashboardSubmenuOpen] = useState(true)
-  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([
-    {
-      id: "1",
-      name: "Carlos Mendes",
-      email: "carlos.mendes@example.com",
-      date: "2023-06-15",
-    },
-    {
-      id: "2",
-      name: "Mariana Oliveira",
-      email: "mariana.oliveira@example.com",
-      date: "2023-06-14",
-    },
-  ])
+  const [showNotifications, setShowNotifications] = useState(false)
 
   const { logout } = useAuth()
   const { toast } = useToast()
@@ -75,10 +62,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      // Show loading spinner or indicator if needed
       await logout()
-
-      // Toast notification will appear on the login page
       toast({
         variant: "success",
         title: "Logout bem-sucedido",
@@ -94,16 +78,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }
 
-  const handleApproveRequest = (id: string) => {
-    setPendingRequests((prev) => prev.filter((request) => request.id !== id))
-    // In a real app, you would send this to your backend
-  }
-
-  const handleRejectRequest = (id: string) => {
-    setPendingRequests((prev) => prev.filter((request) => request.id !== id))
-    // In a real app, you would send this to your backend
-  }
-
   if (!mounted) return null
 
   return (
@@ -116,272 +90,254 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             collapsed ? "w-[70px]" : "w-[240px]"
           }`}
         >
-          {/* Toggle button */}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="absolute left-[calc(var(--sidebar-width)-12px)] top-20 bg-white rounded-full p-1 shadow-md z-20"
-            style={
-              {
-                "--sidebar-width": collapsed ? "70px" : "240px",
-              } as React.CSSProperties
-            }
-          >
-            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
-
-          {/* Logo */}
-          <div className="mt-6 mb-8 flex justify-center shrink-0">
-            <Image
-              src="/abstract-blue-green.png"
-              alt="NCPI Logo"
-              width={collapsed ? 36 : 49}
-              height={collapsed ? 34 : 46}
-            />
+          {/* Logo and Toggle Button */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            {!collapsed && (
+              <Image src="/images/Logo-cor-NCPI.svg" alt="NCPI Logo" width={80} height={30} className="h-auto" />
+            )}
+            {collapsed && (
+              <Image
+                src="/images/Logo-cor-NCPI.svg"
+                alt="NCPI Logo"
+                width={40}
+                height={20}
+                className="h-auto mx-auto"
+              />
+            )}
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className={`text-gray-400 hover:text-[#04695E] focus:outline-none ${collapsed ? "mx-auto" : ""}`}
+            >
+              {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </button>
           </div>
 
+          {/* Search Bar */}
+          {!collapsed && (
+            <div className="px-4 py-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <input
+                  type="text"
+                  placeholder="Pesquisar..."
+                  className="w-full bg-gray-100 rounded-md py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#04695E]"
+                />
+              </div>
+            </div>
+          )}
+          {collapsed && (
+            <div className="py-3 flex justify-center">
+              <button className="text-gray-400 hover:text-[#04695E] p-2 rounded-md hover:bg-gray-100">
+                <Search size={20} />
+              </button>
+            </div>
+          )}
+
           {/* Menu Items */}
-          <div className="flex-1 flex flex-col items-center w-full overflow-y-auto scrollbar-thin">
-            <div className={`w-full flex flex-col ${collapsed ? "items-center" : "items-start px-4"} space-y-1`}>
+          <div className="flex-1 overflow-y-auto py-4">
+            <nav className="px-2 space-y-1">
               {/* Dashboard with submenu */}
-              <div className="w-full">
+              <div>
                 <button
                   onClick={() => setDashboardSubmenuOpen(!dashboardSubmenuOpen)}
-                  className={`w-full flex items-center p-2 rounded-lg transition-colors ${
-                    isDashboardActive ? "bg-[#F4F4EF] text-[#04695E] font-medium" : "text-gray-600 hover:bg-gray-100"
+                  className={`w-full flex items-center ${
+                    collapsed ? "justify-center" : "justify-between"
+                  } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    isDashboardActive ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                    <BarChart2 size={20} className={isDashboardActive ? "text-[#04695E]" : "text-gray-600"} />
+                  <div className="flex items-center">
+                    <LayoutDashboard size={20} className={isDashboardActive ? "text-[#04695E]" : "text-gray-500"} />
+                    {!collapsed && <span className="ml-3">Painel Estratégico</span>}
                   </div>
                   {!collapsed && (
-                    <>
-                      <span className="ml-3 text-sm">Painel Estratégico</span>
-                      <div className="ml-auto">
-                        {dashboardSubmenuOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </div>
-                    </>
+                    <div>
+                      {dashboardSubmenuOpen ? (
+                        <ChevronUp size={16} className="text-gray-400" />
+                      ) : (
+                        <ChevronDown size={16} className="text-gray-400" />
+                      )}
+                    </div>
                   )}
                 </button>
 
                 {/* Submenu */}
                 {dashboardSubmenuOpen && !collapsed && (
-                  <div className="ml-12 mt-1 space-y-1">
+                  <div className="ml-8 mt-1 space-y-1">
                     <Link
                       href="/dashboard?porta=fora"
-                      className={`flex items-center p-2 rounded-lg transition-colors ${
+                      className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
                         isDashboardActive && porta === "fora"
-                          ? "bg-[#F4F4EF] text-[#04695E] font-medium"
+                          ? "text-[#04695E] bg-[#F4F4EF]"
                           : "text-gray-600 hover:bg-gray-100"
                       }`}
                     >
-                      <span className="text-sm">Porta para Fora</span>
+                      <span>Porta para Fora</span>
                     </Link>
                     <Link
                       href="/dashboard?porta=dentro"
-                      className={`flex items-center p-2 rounded-lg transition-colors ${
+                      className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
                         isDashboardActive && porta === "dentro"
-                          ? "bg-[#F4F4EF] text-[#04695E] font-medium"
+                          ? "text-[#04695E] bg-[#F4F4EF]"
                           : "text-gray-600 hover:bg-gray-100"
                       }`}
                     >
-                      <span className="text-sm">Porta para Dentro</span>
+                      <span>Porta para Dentro</span>
                     </Link>
                   </div>
                 )}
               </div>
 
+              {/* Teoria da Mudança */}
               <Link
                 href="/teoria-da-mudanca"
-                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
-                  pathname === "/teoria-da-mudanca"
-                    ? "bg-[#F4F4EF] text-[#04695E] font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === "/teoria-da-mudanca" ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <LineChart
-                    size={20}
-                    className={pathname === "/teoria-da-mudanca" ? "text-[#04695E]" : "text-gray-600"}
-                  />
-                </div>
-                {!collapsed && <span className="ml-3 text-sm">Teoria da Mudança</span>}
+                <LineChart
+                  size={20}
+                  className={pathname === "/teoria-da-mudanca" ? "text-[#04695E]" : "text-gray-500"}
+                />
+                {!collapsed && <span className="ml-3">Teoria da Mudança</span>}
               </Link>
 
+              {/* Governança */}
               <Link
                 href="/governanca"
-                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
-                  pathname === "/governanca"
-                    ? "bg-[#F4F4EF] text-[#04695E] font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === "/governanca" ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <Users size={20} className={pathname === "/governanca" ? "text-[#04695E]" : "text-gray-600"} />
-                </div>
-                {!collapsed && <span className="ml-3 text-sm">Governança</span>}
+                <Users size={20} className={pathname === "/governanca" ? "text-[#04695E]" : "text-gray-500"} />
+                {!collapsed && <span className="ml-3">Governança</span>}
               </Link>
 
+              {/* Sistemática de Monitoramento */}
               <Link
                 href="/sistematica-de-monitoramento"
-                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   pathname === "/sistematica-de-monitoramento"
-                    ? "bg-[#F4F4EF] text-[#04695E] font-medium"
+                    ? "text-[#04695E] bg-[#F4F4EF]"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <Calendar
-                    size={20}
-                    className={pathname === "/sistematica-de-monitoramento" ? "text-[#04695E]" : "text-gray-600"}
-                  />
-                </div>
-                {!collapsed && <span className="ml-3 text-sm">Sistemática de Monitoramento</span>}
+                <Calendar
+                  size={20}
+                  className={pathname === "/sistematica-de-monitoramento" ? "text-[#04695E]" : "text-gray-500"}
+                />
+                {!collapsed && <span className="ml-3">Monitoramento</span>}
               </Link>
 
+              {/* Avaliações */}
               <Link
                 href="/avaliacoes"
-                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
-                  pathname === "/avaliacoes"
-                    ? "bg-[#F4F4EF] text-[#04695E] font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === "/avaliacoes" ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <FileText size={20} className={pathname === "/avaliacoes" ? "text-[#04695E]" : "text-gray-600"} />
-                </div>
-                {!collapsed && <span className="ml-3 text-sm">Avaliações</span>}
+                <FileText size={20} className={pathname === "/avaliacoes" ? "text-[#04695E]" : "text-gray-500"} />
+                {!collapsed && <span className="ml-3">Avaliações</span>}
               </Link>
 
+              {/* Relatórios */}
               <Link
-                href="/settings"
-                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
-                  pathname === "/settings"
-                    ? "bg-[#F4F4EF] text-[#04695E] font-medium"
-                    : "text-gray-600 hover:bg-gray-100"
+                href="/relatorios"
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === "/relatorios" ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <Settings size={20} className={pathname === "/settings" ? "text-[#04695E]" : "text-gray-600"} />
-                </div>
-                {!collapsed && <span className="ml-3 text-sm">Configurações</span>}
+                <BarChart2 size={20} className={pathname === "/relatorios" ? "text-[#04695E]" : "text-gray-500"} />
+                {!collapsed && <span className="ml-3">Relatórios</span>}
               </Link>
-            </div>
+
+              {/* Suporte */}
+              <Link
+                href="/suporte"
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === "/suporte" ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <HelpCircle size={20} className={pathname === "/suporte" ? "text-[#04695E]" : "text-gray-500"} />
+                {!collapsed && <span className="ml-3">Suporte</span>}
+              </Link>
+            </nav>
+          </div>
+
+          {/* Bottom Menu */}
+          <div className="border-t border-gray-100 pt-4 pb-6">
+            <nav className="px-2 space-y-1">
+              {/* Configurações */}
+              <Link
+                href="/settings"
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === "/settings" ? "text-[#04695E] bg-[#F4F4EF]" : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Settings size={20} className={pathname === "/settings" ? "text-[#04695E]" : "text-gray-500"} />
+                {!collapsed && <span className="ml-3">Configurações</span>}
+              </Link>
+
+              {/* Notificações */}
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={`w-full flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors text-gray-600 hover:bg-gray-100`}
+              >
+                <Bell size={20} className="text-gray-500" />
+                {!collapsed && <span className="ml-3">Notificações</span>}
+              </button>
+
+              {/* Logout */}
+              <button
+                onClick={handleLogout}
+                className={`w-full flex items-center ${
+                  collapsed ? "justify-center" : ""
+                } px-3 py-2 text-sm font-medium rounded-md transition-colors text-gray-600 hover:bg-gray-100`}
+              >
+                <LogOut size={20} className="text-gray-500" />
+                {!collapsed && <span className="ml-3">Sair</span>}
+              </button>
+            </nav>
           </div>
 
           {/* User Profile */}
-          {!collapsed && (
-            <div className="mt-auto mb-6 mx-4 bg-gray-50 rounded-lg p-3 flex items-center shrink-0">
+          <div className={`px-3 py-3 border-t border-gray-100 ${collapsed ? "text-center" : ""}`}>
+            <div className={`flex ${collapsed ? "justify-center" : "items-center"}`}>
               <div className="w-8 h-8 rounded-full bg-[#04695E] flex items-center justify-center text-white text-xs font-bold">
                 AS
               </div>
-              <div className="ml-2 text-xs">
-                <div className="font-medium">Ana Silva</div>
-                <div className="text-gray-500 text-[10px]">ana.silva@ncpi.org</div>
-              </div>
+              {!collapsed && (
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-700">Ana Silva</p>
+                  <p className="text-xs text-gray-500 truncate">ana.silva@ncpi.org</p>
+                </div>
+              )}
             </div>
-          )}
-
-          {collapsed && (
-            <div className="mt-auto mb-6 flex justify-center shrink-0">
-              <div className="w-8 h-8 rounded-full bg-[#04695E] flex items-center justify-center text-white text-xs font-bold">
-                AS
-              </div>
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col bg-[#F4F4EF] overflow-hidden rounded-tr-[30px]">
-          {/* Header */}
-          <header className="bg-[#F4F4EF] p-4 flex justify-between items-center border-b border-gray-200 shrink-0">
-            <div className="flex items-center">
-              <h1 className="text-[#04695E] text-xl font-bold">Painel Estratégico NCPI</h1>
-              <Image src="/brazil-outline-map.png" alt="Brazil Map" width={60} height={40} className="ml-4" />
-            </div>
-
-            <div className="flex items-center space-x-6 pr-6">
-              {isAdmin && (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowNotifications(!showNotifications)}
-                    className="text-gray-600 hover:text-[#04695E] focus:outline-none relative"
-                  >
-                    <Bell size={20} />
-                    {pendingRequests.length > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                        {pendingRequests.length}
-                      </span>
-                    )}
-                  </button>
-
-                  {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg z-50">
-                      <div className="p-3 border-b border-gray-200">
-                        <h3 className="text-sm font-semibold">Notificações</h3>
-                      </div>
-
-                      {pendingRequests.length > 0 ? (
-                        <div className="max-h-96 overflow-y-auto">
-                          {pendingRequests.map((request) => (
-                            <div key={request.id} className="p-3 border-b border-gray-100 hover:bg-gray-50">
-                              <div className="flex items-start">
-                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
-                                  <User size={16} />
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium">{request.name}</p>
-                                  <p className="text-xs text-gray-500">{request.email}</p>
-                                  <p className="text-xs text-gray-400 mt-1">
-                                    Solicitação de acesso: {new Date(request.date).toLocaleDateString()}
-                                  </p>
-                                  <div className="flex mt-2 space-x-2">
-                                    <button
-                                      onClick={() => handleApproveRequest(request.id)}
-                                      className="text-xs bg-[#0DBAAD] text-white px-2 py-1 rounded-md hover:bg-[#04695E]"
-                                    >
-                                      Aprovar
-                                    </button>
-                                    <button
-                                      onClick={() => handleRejectRequest(request.id)}
-                                      className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-md hover:bg-gray-300"
-                                    >
-                                      Rejeitar
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-4 text-center text-gray-500 text-sm">Não há notificações no momento.</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <button
-                onClick={handleLogout}
-                className="text-gray-600 hover:text-[#04695E] focus:outline-none flex items-center"
-              >
-                <LogOut size={20} />
-                {!collapsed && <span className="ml-2 text-sm">Sair</span>}
-              </button>
-            </div>
-          </header>
-
           {/* Page Content */}
-          <main className="flex-1 overflow-auto bg-[#F4F4EF] pl-0 pr-6 py-6">{children}</main>
+          <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
     </div>
   )
-}
-
-interface PendingRequest {
-  id: string
-  name: string
-  email: string
-  date: string
 }
