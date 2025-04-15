@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as db from '@/lib/local-db';
 
-type Params = {
+type RouteParams = {
   id: string;
 };
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  params: RouteParams
 ): Promise<NextResponse> {
   try {
     const initiative = await db.getInitiativeById(params.id);
@@ -31,7 +31,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params }
+  params: RouteParams
 ): Promise<NextResponse> {
   try {
     const updates = await request.json();
@@ -49,7 +49,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params }
+  params: RouteParams
 ): Promise<NextResponse> {
   try {
     await db.deleteInitiative(params.id);
