@@ -92,18 +92,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         >
           {/* Logo and Toggle Button */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            {!collapsed && (
-              <Image src="/images/Logo-cor-NCPI.svg" alt="NCPI Logo" width={80} height={30} className="h-auto" />
-            )}
-            {collapsed && (
-              <Image
-                src="/images/Logo-cor-NCPI.svg"
-                alt="NCPI Logo"
-                width={40}
-                height={20}
-                className="h-auto mx-auto"
-              />
-            )}
+            
             <button
               onClick={() => setCollapsed(!collapsed)}
               className={`text-gray-400 hover:text-[#04695E] focus:outline-none ${collapsed ? "mx-auto" : ""}`}
