@@ -70,10 +70,27 @@ export function MetaViewModal({ isOpen, onClose, meta }: MetaViewModalProps) {
 
   const currentStatus = statusHistory[currentStatusIndex]
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "satisfatorio":
+        return "bg-[#0DBAAD]"
+      case "alerta":
+        return "bg-[#FFA500]"
+      case "critico":
+        return "bg-[#FF0000]"
+      case "concluido":
+        return "bg-[#008000]"
+      case "naoMonitorado":
+        return "bg-[#808080]"
+      default:
+        return "bg-gray-500"
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[650px]">
-        <DialogHeader>
+        <DialogHeader className="bg-gradient-to-r from-[#04695E]/10 to-white rounded-t-xl">
           <DialogTitle className="text-[#04695E] text-xl">Meta</DialogTitle>
         </DialogHeader>
 
@@ -118,9 +135,11 @@ export function MetaViewModal({ isOpen, onClose, meta }: MetaViewModalProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-3">
-                <StatusIcon status={currentStatus.status as any} size="md" />
-                <div>
-                  <span className="font-medium">{getStatusLabel(currentStatus.status)}</span>
+                <StatusIcon status={currentStatus.status as any} size="lg" />
+                <div className="flex items-center">
+                  <span className={`font-medium ${getStatusColor(currentStatus.status)} rounded-full px-2 py-1`}>
+                    {getStatusLabel(currentStatus.status)}
+                  </span>
                   <span className="ml-4 text-sm text-gray-500">Data: {currentStatus.date}</span>
                 </div>
               </div>
@@ -164,8 +183,8 @@ export function MetaViewModal({ isOpen, onClose, meta }: MetaViewModalProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {meta.encaminhamentos.map((encaminhamento) => (
-                    <div key={encaminhamento.id} className="bg-gray-50 p-3 rounded-md">
+                  {meta.encaminhamentos.map((encaminhamento, index) => (
+                    <div key={encaminhamento.id} className={`bg-gray-50 p-3 rounded-md ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}>
                       <p className="text-sm">{encaminhamento.description}</p>
                       <div className="flex justify-between mt-2 text-xs text-gray-500">
                         <span>Responsável: {encaminhamento.responsavel}</span>

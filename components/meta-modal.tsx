@@ -206,13 +206,13 @@ export function MetaModal({ isOpen, onClose, meta }: MetaModalProps) {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-[#04695E]/10 to-white">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-[#04695E]/10 to-white rounded-t-xl">
               <div className="flex items-center">
                 <motion.div
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: animateStatus ? 1 : 0.5, opacity: animateStatus ? 1 : 0 }}
                   transition={{ type: "spring", damping: 20, stiffness: 300, delay: 0.2 }}
-                  className={`w-3 h-3 rounded-full ${getStatusColor(meta.status)} mr-3`}
+                  className={`w-4 h-4 rounded-full ${getStatusColor(meta.status)} mr-3 shadow-md`}
                 ></motion.div>
                 <h2 id="meta-modal-title" className="text-xl font-semibold text-[#04695E]">
                   {meta.description}
@@ -277,7 +277,7 @@ export function MetaModal({ isOpen, onClose, meta }: MetaModalProps) {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {/* Initiative & Result Card */}
-                    <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
                       <div className="mb-4">
                         <div className="flex items-center mb-2">
                           <div className="w-8 h-8 rounded-full bg-[#F4F4EF] flex items-center justify-center mr-2">
@@ -300,7 +300,7 @@ export function MetaModal({ isOpen, onClose, meta }: MetaModalProps) {
                     </div>
 
                     {/* Responsible & Progress Card */}
-                    <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow">
                       <div className="mb-4">
                         <div className="flex items-center mb-2">
                           <div className="w-8 h-8 rounded-full bg-[#F4F4EF] flex items-center justify-center mr-2">
@@ -355,7 +355,7 @@ export function MetaModal({ isOpen, onClose, meta }: MetaModalProps) {
                   </div>
 
                   {/* Current Status Card */}
-                  <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow mb-6">
+                  <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow mb-6">
                     <h3 className="text-lg font-medium text-[#04695E] mb-4">Status Atual</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -406,7 +406,7 @@ export function MetaModal({ isOpen, onClose, meta }: MetaModalProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm mb-6">
+                  <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow mb-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-medium text-[#04695E]">Histórico de Status</h3>
 
@@ -541,7 +541,7 @@ export function MetaModal({ isOpen, onClose, meta }: MetaModalProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm mb-6">
+                  <div className="bg-white rounded-lg p-5 border border-gray-200 shadow-lg hover:shadow-xl transition-shadow mb-6">
                     <h3 className="text-lg font-medium text-[#04695E] mb-4">Encaminhamentos</h3>
                     <div className="overflow-hidden rounded-lg border border-gray-200">
                       <table className="w-full text-sm">
