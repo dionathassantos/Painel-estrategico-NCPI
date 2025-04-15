@@ -102,12 +102,12 @@ export default function DashboardPage() {
           {/* Métricas à esquerda */}
           <div className="col-span-3">
             <div className="relative pl-6">
-              {/* Linha vertical conectora */}
-              <div className="absolute left-0 top-8 bottom-0 w-0.5 bg-[#A6CE39] h-[calc(100%-30px)]"></div>
+              {/* Linha vertical conectora principal */}
+              <div className="absolute left-0 top-8 bottom-0 w-0.5 bg-[#A6CE39]"></div>
 
               {/* Iniciativas Card */}
               <div className="flex items-center bg-white border border-gray-200 h-[50px] rounded-md shadow-sm mb-4 relative">
-                {/* Linha horizontal conectora */}
+                {/* Conector horizontal */}
                 <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
                 <div className="ml-4 text-[#A6CE39]">
                   <Star className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
@@ -118,8 +118,10 @@ export default function DashboardPage() {
 
               {/* Resultados Card */}
               <div className="flex items-center bg-white border border-gray-200 h-[50px] rounded-md shadow-sm mb-4 ml-6 relative">
-                {/* Linha horizontal conectora */}
+                {/* Conector horizontal */}
                 <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
+                {/* Conector curvo */}
+                <div className="absolute -left-6 -top-4 w-[15px] h-[29px] border-l border-t border-[#A6CE39] rounded-tl-[7px]"></div>
                 <div className="ml-4 text-[#A6CE39]">
                   <Flag className="h-5 w-5 fill-[#A6CE39] text-[#A6CE39]" />
                 </div>
@@ -129,8 +131,10 @@ export default function DashboardPage() {
 
               {/* Metas Card */}
               <div className="flex items-center bg-[#04695E] border border-[#04695E] h-[50px] rounded-md shadow-sm ml-12 relative">
-                {/* Linha horizontal conectora */}
+                {/* Conector horizontal */}
                 <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-[#A6CE39]"></div>
+                {/* Conector curvo */}
+                <div className="absolute -left-6 -top-4 w-[15px] h-[29px] border-l border-t border-[#A6CE39] rounded-tl-[7px]"></div>
                 <div className="ml-4 text-white">
                   <Target className="h-5 w-5 text-[#A6CE39]" />
                 </div>
