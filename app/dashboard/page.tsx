@@ -100,7 +100,7 @@ export default function DashboardPage() {
         {/* Grid principal com métricas e status */}
         <div className="grid grid-cols-12 gap-6 mb-8">
           {/* Métricas à esquerda */}
-          <div className="col-span-4">
+          <div className="col-span-3">
             <div className="relative pl-6">
               {/* Linha vertical conectora */}
               <div className="absolute left-0 top-8 bottom-0 w-0.5 bg-[#A6CE39] h-[calc(100%-30px)]"></div>
@@ -141,7 +141,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Status das Metas à direita */}
-          <div className="col-span-8">
+          <div className="col-span-9">
             <div className="bg-[#04695E] rounded-tr-[50px] p-5 text-white h-full">
               <div className="flex items-center mb-6">
                 <h3 className="text-sm font-bold uppercase border-l-4 border-[#A6CE39] pl-3">STATUS DAS METAS</h3>
